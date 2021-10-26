@@ -2,7 +2,7 @@ import sqlite3
 from flask import Flask, render_template, g, redirect, url_for, session
 
 from forms import CreatePostForm
-from validations import validate1
+from validations import validate1, validate2
 
 
 app = Flask(__name__)
@@ -44,6 +44,16 @@ def create_post():
 
         return redirect(url_for("all_posts"))
     return render_template("create_post.html", form=form)
+
+@app.route("/all_posts")
+def all_posts():
+    cur = get_db().cursor()
+    data = cur.execute(
+        """
+        SELECT id, post, is_admin FROM posts
+        """
+    ).fetchall()
+    return render_template("all_posts.html", data=data, can_read=validate2(session, cur), is_admin=validate1(session, cur))
 
 
 app.run("0.0.0.0", debug=True)
