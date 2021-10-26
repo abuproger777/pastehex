@@ -1,9 +1,21 @@
-from flask import Flask, render_template
+import sqlite3
+from flask import Flask, render_template, g
 
 
 app = Flask(__name__)
-app.secret_key = "420bf172a6297fc6558b8a6075af347a83b124ccd8551b181a62bac7aefef321"
 app.config["SESSION_COOKIE_HTTPONLY"] = False
+
+def get_db():
+        db = getattr(g, "_database", None)
+        if db is None:
+            db = g._database = sqlite3.connect("pastehex.db")
+        return db
+    
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
 
 @app.route("/")
 def index():
