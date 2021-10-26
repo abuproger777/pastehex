@@ -1,8 +1,8 @@
 import sqlite3
-from flask import Flask, render_template, g, redirect, url_for, session
+from flask import Flask, render_template, g, redirect, url_for, session, jsonify
 
 from forms import CreatePostForm
-from validations import validate1, validate2
+from validations import validate1, validate2, validate3
 
 
 app = Flask(__name__)
@@ -55,5 +55,29 @@ def all_posts():
     ).fetchall()
     return render_template("all_posts.html", data=data, can_read=validate2(session, cur), is_admin=validate1(session, cur))
 
+@app.route("/delete")
+def max_id():
+    cur = get_db().cursor()
+    data = cur.execute(
+        """
+        SELECT * FROM posts ORDER BY id DESC LIMIT 1
+        """
+    ).fetchone()
+    return jsonify({"answer": data[0]})
 
-app.run("0.0.0.0", debug=True)
+@app.route("/delete/<int:post_id>")
+def delete_post(post_id):
+    cur = get_db().cursor()
+    if validate3(post_id, session, cur):
+        db = get_db()
+        cur = db.cursor()
+        cur.execute(
+            """
+            DELETE FROM posts WHERE id = ?
+            """, (post_id,)
+        )
+        db.commit()
+        return "OK"
+    return "Something wrong!"
+
+app.run("0.0.0.0", debug=False)
