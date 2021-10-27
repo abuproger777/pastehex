@@ -30,8 +30,6 @@ def create_post():
 
     if form.submit.data and form.validate():
         post = form.post.data
-        post = post.replace("{", "&#123;").replace("}", "&#125;")  # No server-side template injection
-
         db = get_db()
         cur = db.cursor()
         is_admin = validate1(session, cur)
