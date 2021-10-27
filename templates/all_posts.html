@@ -14,7 +14,7 @@
         <p>Posts:</p>
         {% for post_data in data %}
             {% if can_read or not post_data[2] %}
-                <p>ID({{ post_data[0] }}): {{ (post_data[1])|safe }}</p>
+                <p>ID({{ post_data[0] }}): {{ (post_data[1]) }}</p>
             {% endif %}
         {% endfor %}
     </body>
